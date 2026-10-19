@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tseki - Admin Dashboard</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#fff7ed',
+                            100: '#ffedd5',
+                            500: '#f97316',
+                            600: '#ea580c',
+                            700: '#c2410c',
+                            800: '#9a3412',
+                        },
+                        darkbg: {
+                            900: '#0f172a',
+                            800: '#1e293b',
+                            700: '#334155',
+                            600: '#475569'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom scrollbars */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+        }
+        .dark ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 9999px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #475569;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        .dark ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+
+        .modal-backdrop {
+            backdrop-filter: blur(8px);
+        }
+
+        /* Highlight Flash Keyframe Animations */
+        @keyframes sectionFlashAmber {
+            0% { ring-width: 4px; ring-color: rgba(245, 158, 11, 0.9); transform: scale(1.006); }
+            50% { ring-width: 4px; ring-color: rgba(245, 158, 11, 0.5); transform: scale(1); }
+            100% { ring-width: 0px; ring-color: transparent; }
+        }
+        @keyframes sectionFlashBrand {
+            0% { ring-width: 4px; ring-color: rgba(249, 115, 22, 0.9); transform: scale(1.006); }
+            50% { ring-width: 4px; ring-color: rgba(249, 115, 22, 0.5); transform: scale(1); }
+            100% { ring-width: 0px; ring-color: transparent; }
+        }
+        .flash-amber {
+            animation: sectionFlashAmber 1.2s ease-out;
+        }
+        .flash-brand {
+            animation: sectionFlashBrand 1.2s ease-out;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans antialiased min-h-screen flex flex-col selection:bg-brand-500 selection:text-white transition-colors duration-300">
+
+    <!-- TOP HEADER -->
+    <header class="bg-gradient-to-r from-brand-600 via-brand-500 to-amber-600 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 text-white shadow-md sticky top-0 z-30 transition-colors duration-300 border-b border-transparent dark:border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            
+            <!-- Brand Logo & Name -->
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+                <div class="w-10 h-10 rounded-xl bg-white/20 dark:bg-brand-500/20 backdrop-blur-md flex items-center justify-center text-white border border-white/30 dark:border-brand-500/30 shadow-inner">
+                    <i class="fa-solid font-bold text-xl">✔️</i>
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-2xl font-extrabold tracking-tight leading-none text-white flex items-center gap-1.5">
+                        Tseki
+                        <span class="text-[10px] uppercase tracking-wider font-bold bg-white/20 dark:bg-brand-500/20 text-white dark:text-brand-400 px-2 py-0.5 rounded-full border border-white/20 dark:border-brand-500/30">Admin</span>
+                    </span>
+                    <span class="text-xs text-amber-100 dark:text-slate-400 font-medium">Educational Assessment & Verification</span>
+                </div>
+            </div>
+
+            <!-- Profile Info, Theme Switcher & Settings Toggle -->
+            <div class="flex items-center space-x-3 sm:space-x-4">
+                
+                <!-- Quick Theme Toggle Switch -->
+                <button onclick="toggleTheme()" class="p-2 text-white/90 hover:text-white hover:bg-white/10 dark:hover:bg-slate-700/50 rounded-xl transition-all" title="Toggle Light/Dark Theme">
+                    <i id="themeToggleIcon" class="fa-solid fa-moon text-lg"></i>
+                </button>
+
+                <button class="relative p-2 text-white/90 hover:text-white hover:bg-white/10 dark:hover:bg-slate-700/50 rounded-xl transition-colors" title="Notifications">
+                    <i class="fa-regular fa-bell text-lg"></i>
+                    <span class="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-emerald-400 rounded-full ring-2 ring-brand-600 dark:ring-slate-900"></span>
+                </button>
+                
+                <div class="h-6 w-px bg-white/20 dark:bg-slate-700"></div>
+
+                <!-- Admin Settings / Password Change Icon Button (Replaced Profile Image) -->
+                <button onclick="openSettingsModal()" class="flex items-center space-x-2.5 px-3 py-2 rounded-xl hover:bg-white/10 dark:hover:bg-slate-800 transition-all border border-transparent hover:border-white/20 group">
+                    <div class="w-9 h-9 rounded-xl bg-white/20 dark:bg-slate-800 flex items-center justify-center text-white shadow-sm border border-white/30 dark:border-slate-700 group-hover:scale-105 transition-transform">
+                        <i class="fa-solid fa-gear text-base group-hover:rotate-45 transition-transform duration-300"></i>
+                    </div>
+                    <div class="hidden sm:block text-left">
+                        <div class="text-sm font-semibold leading-none text-white group-hover:text-amber-100 dark:group-hover:text-brand-400 transition-colors">Administrator</div>
+                        <div class="text-[11px] text-amber-100 dark:text-slate-400 font-medium mt-1">System Controller</div>
+                    </div>
+                </button>
+
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+        
+        <!-- Dashboard Title & Quick Refresh -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+                <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight flex items-center gap-2.5">
+                    <i class="fa-solid fa-shapes text-brand-600 dark:text-brand-500"></i> Dashboard
+                </h1>
+                <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Overview of teacher registrations, account statuses, and system activity logs.</p>
+            </div>
+            <div class="flex items-center space-x-2">
+                <span id="liveClock" class="text-xs font-semibold text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-900 px-3 py-1.5 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800">
+                    <!-- Updated via JS -->
+                </span>
+            </div>
+        </div>
+
+        <!-- 1. SUMMARY STATS CARDS -->
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-5">
+            <!-- Stat 1: Total Accounts -->
+            <div onclick="scrollToSection('accountManagementSection', 'ALL')" class="bg-white dark:bg-slate-900 rounded-2xl p-5 shadow-sm border border-slate-200/80 dark:border-slate-800 hover:border-brand-400 dark:hover:border-brand-500 hover:shadow-md hover:-translate-y-0.5 transition-all cursor-pointer flex items-center justify-between relative overflow-hidden group">
+                <div class="space-y-1">
+                    <div class="flex items-center gap-2">
+                        <p class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Total Accounts</p>
+                        <span class="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 group-hover:bg-brand-50 dark:group-hover:bg-brand-950/50 group-hover:text-brand-600 dark:group-hover:text-brand-400 px-2 py-0.5 rounded-full font-semibold transition-colors">Click to view &darr;</span>
+                    </div>
+                    <h2 id="statTotalAccounts" class="text-3xl font-black text-slate-900 dark:text-white">0</h2>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                        <span class="text-emerald-600 dark:text-emerald-400 font-bold inline-flex items-center"><i class="fa-solid fa-arrow-up text-[10px] mr-0.5"></i> Active System</span>
+                    </p>
+                </div>
+                <div class="w-14 h-14 rounded-2xl bg-brand-50 dark:bg-slate-800 text-brand-600 dark:text-brand-400 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+                <div class="absolute -right-2 -bottom-2 w-20 h-20 bg-brand-500/5 rounded-full blur-xl pointer-events-none"></div>
+            </div>
+
+            <!-- Stat 2: Pending Approvals -->
+            <div onclick="scrollToSection('pendingApprovalsSection')" class="bg-white dark:bg-slate-900 rounded-2xl p-5 shadow-sm border border-slate-200/80 dark:border-slate-800 hover:border-amber-400 dark:hover:border-amber-500 hover:shadow-md hover:-translate-y-0.5 transition-all cursor-pointer flex items-center justify-between relative overflow-hidden group">
+                <div class="space-y-1">
+                    <div class="flex items-center gap-2">
+                        <p class="text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">Pending Approvals</p>
+                        <span class="text-[10px] bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 px-2 py-0.5 rounded-full font-semibold group-hover:bg-amber-100 dark:group-hover:bg-amber-900/60 transition-colors">Click to view &darr;</span>
+                    </div>
+                    <h2 id="statPendingCount" class="text-3xl font-black text-amber-600 dark:text-amber-400">0</h2>
+                    <p class="text-xs text-amber-700/80 dark:text-amber-400/80 font-medium flex items-center gap-1">
+                        <i class="fa-solid fa-clock text-amber-500"></i> Requires Action
+                    </p>
+                </div>
+                <div class="w-14 h-14 rounded-2xl bg-amber-50 dark:bg-slate-800 text-amber-600 dark:text-amber-400 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-user-clock"></i>
+                </div>
+                <div class="absolute -right-2 -bottom-2 w-20 h-20 bg-amber-500/10 rounded-full blur-xl pointer-events-none"></div>
+            </div>
+
+            <!-- Stat 3: Active Accounts -->
+            <div onclick="scrollToSection('accountManagementSection', 'Active')" class="bg-white dark:bg-slate-900 rounded-2xl p-5 shadow-sm border border-slate-200/80 dark:border-slate-800 hover:border-emerald-400 dark:hover:border-emerald-500 hover:shadow-md hover:-translate-y-0.5 transition-all cursor-pointer flex items-center justify-between relative overflow-hidden group">
+                <div class="space-y-1">
+                    <div class="flex items-center gap-2">
+                        <p class="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Active Accounts</p>
+                        <span class="text-[10px] bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 px-2 py-0.5 rounded-full font-semibold group-hover:bg-emerald-100 dark:group-hover:bg-emerald-900/60 transition-colors">Click to view &darr;</span>
+                    </div>
+                    <h2 id="statActiveCount" class="text-3xl font-black text-emerald-600 dark:text-emerald-400">0</h2>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                        <span class="text-emerald-600 dark:text-emerald-400 font-semibold"><i class="fa-solid fa-circle text-[8px] mr-1"></i> Verified Teachers</span>
+                    </p>
+                </div>
+                <div class="w-14 h-14 rounded-2xl bg-emerald-50 dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-user-check"></i>
+                </div>
+                <div class="absolute -right-2 -bottom-2 w-20 h-20 bg-emerald-500/10 rounded-full blur-xl pointer-events-none"></div>
+            </div>
+        </section>
+
+        <!-- 2. PENDING APPROVALS SECTION -->
+        <section id="pendingApprovalsSection" class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-sm overflow-hidden scroll-mt-24 transition-all">
+            <div class="px-6 py-5 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50/50 dark:bg-slate-800/30">
+                <div class="flex items-center space-x-3">
+                    <div class="p-2 bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 rounded-xl">
+                        <i class="fa-solid fa-user-plus text-base"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-900 dark:text-white">Pending Approvals</h2>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">New teacher verification requests waiting for validation</p>
+                    </div>
+                </div>
+                <span id="pendingBadgeCount" class="self-start sm:self-auto bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 text-xs font-bold px-3 py-1 rounded-full border border-amber-200 dark:border-amber-800/50">
+                    0 Requests Pending
+                </span>
+            </div>
+
+            <!-- Scrollable Container for 5+ Pending Approvals -->
+            <div class="overflow-x-auto max-h-[320px] overflow-y-auto">
+                <table class="w-full text-left border-collapse relative">
+                    <thead class="sticky top-0 bg-slate-100 dark:bg-slate-800 z-10">
+                        <tr class="text-slate-500 dark:text-slate-400 text-[11px] uppercase tracking-wider font-bold border-b border-slate-200 dark:border-slate-700">
+                            <th class="py-3.5 px-6">Name</th>
+                            <th class="py-3.5 px-6">Grade Level</th>
+                            <th class="py-3.5 px-6">Subject / Field</th>
+                            <th class="py-3.5 px-6 text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pendingTableBody" class="divide-y divide-slate-100 dark:divide-slate-800 text-sm">
+                        <!-- Rendered via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Empty State Container for Pending -->
+            <div id="pendingEmptyState" class="hidden p-8 text-center text-slate-400 dark:text-slate-500">
+                <i class="fa-solid fa-circle-check text-4xl text-emerald-400 dark:text-emerald-500 mb-2"></i>
+                <p class="text-sm font-semibold text-slate-600 dark:text-slate-300">All caught up!</p>
+                <p class="text-xs text-slate-400 dark:text-slate-500">There are no pending approval requests at this moment.</p>
+            </div>
+        </section>
+
+        <!-- 3. ACCOUNT MANAGEMENT SECTION -->
+        <section id="accountManagementSection" class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-sm overflow-hidden scroll-mt-24 transition-all">
+            <div class="px-6 py-5 border-b border-slate-100 dark:border-slate-800 flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-slate-50/50 dark:bg-slate-800/30">
+                <div class="flex items-center space-x-3">
+                    <div class="p-2 bg-brand-100 dark:bg-brand-950/60 text-brand-700 dark:text-brand-400 rounded-xl">
+                        <i class="fa-solid fa-users-gear text-base"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-900 dark:text-white">Account Management</h2>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Manage existing teacher accounts, toggle status, or remove users</p>
+                    </div>
+                </div>
+
+                <!-- Search & Filters -->
+                <div class="flex flex-col sm:flex-row items-center gap-2.5">
+                    <div class="relative w-full sm:w-64">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 text-xs"></i>
+                        <input type="text" id="accountSearchInput" placeholder="Search teacher or role..." class="w-full pl-9 pr-3 py-1.5 text-xs bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 transition-all">
+                    </div>
+                    <select id="accountStatusFilter" class="w-full sm:w-auto px-3 py-1.5 text-xs bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 text-slate-700 dark:text-slate-200 font-medium">
+                        <option value="ALL">All Statuses</option>
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Scrollable Container for 5+ Accounts -->
+            <div class="overflow-x-auto max-h-[320px] overflow-y-auto">
+                <table class="w-full text-left border-collapse relative">
+                    <thead class="sticky top-0 bg-slate-100 dark:bg-slate-800 z-10">
+                        <tr class="text-slate-500 dark:text-slate-400 text-[11px] uppercase tracking-wider font-bold border-b border-slate-200 dark:border-slate-700">
+                            <th class="py-3.5 px-6">Name</th>
+                            <th class="py-3.5 px-6">Grade Level</th>
+                            <th class="py-3.5 px-6">Status</th>
+                            <th class="py-3.5 px-6 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="accountTableBody" class="divide-y divide-slate-100 dark:divide-slate-800 text-sm">
+                        <!-- Rendered via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="accountsEmptyState" class="hidden p-8 text-center text-slate-400 dark:text-slate-500">
+                <i class="fa-solid fa-user-slash text-3xl mb-2"></i>
+                <p class="text-sm font-semibold text-slate-600 dark:text-slate-300">No accounts match your criteria</p>
+            </div>
+        </section>
+
+        <!-- 4. ACTIVITY LOG SECTION -->
+        <section class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-sm overflow-hidden">
+            <div class="px-6 py-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/30">
+                <div class="flex items-center space-x-3">
+                    <div class="p-2 bg-blue-100 dark:bg-blue-950/60 text-blue-700 dark:text-blue-400 rounded-xl">
+                        <i class="fa-solid fa-list-check text-base"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-900 dark:text-white">Activity Log</h2>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Real-time audit trail of assessment generations and administrative actions</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <span id="activityLogBadge" class="text-xs font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-700">
+                        0 Events
+                    </span>
+                    <button onclick="requestClearLogs()" class="text-xs text-slate-600 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 font-semibold transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 active:scale-95">
+                        <i class="fa-solid fa-trash-can"></i> Clear Log
+                    </button>
+                </div>
+            </div>
+
+            <!-- Scrollable Container for Activity Logs -->
+            <div class="overflow-x-auto max-h-[320px] overflow-y-auto">
+                <table class="w-full text-left border-collapse relative">
+                    <thead class="sticky top-0 bg-slate-100 dark:bg-slate-800 z-10">
+                        <tr class="text-slate-500 dark:text-slate-400 text-[11px] uppercase tracking-wider font-bold border-b border-slate-200 dark:border-slate-700">
+                            <th class="py-3 px-6">ID</th>
+                            <th class="py-3 px-6">Name</th>
+                            <th class="py-3 px-6">Action / Event</th>
+                            <th class="py-3 px-6 text-right">Time & Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="activityLogTableBody" class="divide-y divide-slate-100 dark:divide-slate-800 text-sm font-medium">
+                        <!-- Rendered via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Empty State for Activity Log -->
+            <div id="activityLogEmptyState" class="hidden p-8 text-center text-slate-400 dark:text-slate-500">
+                <i class="fa-solid fa-folder-open text-3xl mb-2 text-slate-300 dark:text-slate-600"></i>
+                <p class="text-sm font-semibold text-slate-600 dark:text-slate-300">No activity logs found</p>
+                <p class="text-xs text-slate-400 dark:text-slate-500">All administrative and assessment events will record here.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-4 mt-8 transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 dark:text-slate-400 gap-2">
+            <p>© 2026 Tseki Assessment & Verification System. All rights reserved.</p>
+            <div class="flex items-center space-x-4">
+                <span class="hover:text-slate-700 dark:hover:text-slate-200 cursor-pointer">Privacy Policy</span>
+                <span>•</span>
+                <span class="hover:text-slate-700 dark:hover:text-slate-200 cursor-pointer">Terms of Service</span>
+                <span>•</span>
+                <span class="hover:text-slate-700 dark:hover:text-slate-200 cursor-pointer">System Status</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- APPROVAL REQUEST MODAL -->
+    <div id="approvalModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 modal-backdrop hidden transition-opacity duration-200 opacity-0">
+        <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl max-w-2xl w-full overflow-hidden border border-slate-100 dark:border-slate-800 transform scale-95 transition-all duration-200" id="approvalModalCard">
+            
+            <!-- Modal Header -->
+            <div class="px-6 py-4 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <span class="w-3 h-3 rounded-full bg-brand-500 inline-block"></span>
+                    <h3 class="text-lg font-bold text-slate-900 dark:text-white">Approval Request</h3>
+                </div>
+                <button onclick="closeModal('approvalModal', 'approvalModalCard')" class="w-8 h-8 rounded-full bg-slate-200/70 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 flex items-center justify-center transition-colors">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Modal Content -->
+            <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 block">Teacher Name</label>
+                        <p id="modalName" class="text-base font-bold text-slate-800 dark:text-white mt-0.5">Amaquin Christian John</p>
+                    </div>
+
+                    <div>
+                        <label class="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 block">Institutional Email</label>
+                        <p id="modalEmail" class="text-sm font-semibold text-brand-600 dark:text-brand-400 mt-0.5 break-all">lalovesheand@gmail.com</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 block">Teacher ID</label>
+                            <p id="modalTeacherId" class="text-sm font-bold text-slate-800 dark:text-slate-100 mt-0.5 bg-slate-100 dark:bg-slate-800 inline-block px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-700">102262</p>
+                        </div>
+                        <div>
+                            <label class="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 block">Grade Level</label>
+                            <p id="modalGrade" class="text-sm font-semibold text-slate-800 dark:text-slate-100 mt-0.5">Senior High</p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 block">Strand / Subject</label>
+                        <p id="modalStrand" class="text-sm font-semibold text-slate-800 dark:text-slate-100 mt-0.5">HUMSS (Personal Development)</p>
+                    </div>
+                </div>
+
+                <!-- Attached ID Preview -->
+                <div class="bg-slate-50 dark:bg-slate-800/40 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-2xl p-4 flex flex-col items-center justify-center text-center min-h-[220px]">
+                    <div id="modalPhotoContainer" class="w-full h-full flex flex-col items-center justify-center space-y-3">
+                        <div class="w-full h-40 bg-slate-200 dark:bg-slate-800 rounded-xl overflow-hidden relative group shadow-inner border border-slate-300 dark:border-slate-700">
+                            <div class="absolute inset-0 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900 p-3 flex flex-col justify-between">
+                                <div class="flex items-center justify-between border-b border-slate-300 dark:border-slate-700 pb-2">
+                                    <span class="text-[10px] font-black uppercase tracking-wider text-slate-600 dark:text-slate-300">Tseki ID Card</span>
+                                    <i class="fa-solid fa-id-card text-slate-400 dark:text-slate-500 text-sm"></i>
+                                </div>
+                                <div class="flex items-center space-x-3 my-auto">
+                                    <div class="w-12 h-12 rounded-lg bg-brand-500 text-white font-extrabold text-lg flex items-center justify-center shadow">
+                                        <span id="modalInitials">AC</span>
+                                    </div>
+                                    <div class="text-left">
+                                        <p id="modalPhotoName" class="text-xs font-bold text-slate-800 dark:text-white">Amaquin Christian</p>
+                                        <p id="modalPhotoRole" class="text-[10px] text-slate-500 dark:text-slate-400 font-medium">Faculty Member</p>
+                                    </div>
+                                </div>
+                                <div class="text-[9px] text-slate-400 dark:text-slate-500 text-right uppercase tracking-widest font-mono">
+                                    VERIFIED-TS-2026
+                                </div>
+                            </div>
+                        </div>
+                        <span class="text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                            <i class="fa-solid fa-paperclip text-slate-400"></i> Photo Attached (Verified)
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="px-6 py-4 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 grid grid-cols-2 gap-4">
+                <button id="btnApprove" onclick="handleApprove()" class="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 active:scale-95">
+                    <i class="fa-solid fa-check text-lg"></i> Approve
+                </button>
+                <button id="btnReject" onclick="handleReject()" class="w-full py-3 px-4 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 active:scale-95">
+                    <i class="fa-solid fa-xmark text-lg"></i> Reject
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- UPDATE PASSWORD / SECURITY MODAL ONLY -->
+    <div id="settingsModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 modal-backdrop hidden transition-opacity duration-200 opacity-0">
+        <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl max-w-md w-full overflow-hidden border border-slate-100 dark:border-slate-800 transform scale-95 transition-all duration-200" id="settingsModalCard">
+            
+            <!-- Modal Header -->
+            <div class="px-6 py-4 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                <div class="flex items-center space-x-2.5">
+                    <div class="p-2 bg-brand-100 dark:bg-brand-950/60 text-brand-600 dark:text-brand-400 rounded-xl">
+                        <i class="fa-solid fa-lock text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-900 dark:text-white">Update Password</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Change your administrator access credentials</p>
+                    </div>
+                </div>
+                <button onclick="closeModal('settingsModal', 'settingsModalCard')" class="w-8 h-8 rounded-full bg-slate-200/70 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 flex items-center justify-center transition-colors">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Password Form -->
+            <div class="p-6">
+                <form id="settingsSecurityForm" onsubmit="changeAdminPassword(event)" class="space-y-4">
+                    <div>
+                        <label class="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">Current Password</label>
+                        <input type="password" id="currentPasswordInput" required placeholder="••••••••" class="w-full px-3.5 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500 text-slate-800 dark:text-white">
+                    </div>
+
+                    <div>
+                        <label class="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">New Password</label>
+                        <input type="password" id="newPasswordInput" required placeholder="Minimum 6 characters" class="w-full px-3.5 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500 text-slate-800 dark:text-white">
+                    </div>
+
+                    <div>
+                        <label class="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">Confirm New Password</label>
+                        <input type="password" id="confirmPasswordInput" required placeholder="Repeat new password" class="w-full px-3.5 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500 text-slate-800 dark:text-white">
+                    </div>
+
+                    <div class="p-3 bg-amber-50 dark:bg-amber-950/40 rounded-xl border border-amber-200 dark:border-amber-800/50 flex items-start space-x-2.5">
+                        <i class="fa-solid fa-shield-halved text-amber-600 dark:text-amber-400 text-sm mt-0.5"></i>
+                        <p class="text-xs text-amber-800 dark:text-amber-300">Default demo password is <span class="font-bold">admin123</span>. Passwords must be at least 6 characters long.</p>
+                    </div>
+
+                    <div class="pt-2 flex justify-end">
+                        <button type="submit" class="w-full sm:w-auto px-5 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs rounded-xl shadow-md transition-all active:scale-95 flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-key"></i> Update Password
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- GENERAL REASSURANCE CONFIRMATION MODAL -->
+    <div id="confirmationModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 modal-backdrop hidden transition-opacity duration-200 opacity-0">
+        <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl max-w-md w-full overflow-hidden border border-slate-100 dark:border-slate-800 transform scale-95 transition-all duration-200 p-6 text-center space-y-5" id="confirmationModalCard">
+            
+            <div id="confirmIconContainer" class="w-16 h-16 rounded-2xl bg-amber-100 text-amber-600 mx-auto flex items-center justify-center text-2xl shadow-inner">
+                <i id="confirmIcon" class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+
+            <div class="space-y-2">
+                <h3 id="confirmTitle" class="text-xl font-extrabold text-slate-900 dark:text-white">Are you sure?</h3>
+                <p id="confirmMessage" class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                    This action requires administrator confirmation. Please verify your decision.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 pt-2">
+                <button onclick="closeModal('confirmationModal', 'confirmationModalCard')" class="w-full py-2.5 px-4 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold rounded-xl text-xs transition-colors">
+                    Cancel
+                </button>
+                <button id="confirmActionButton" onclick="executeConfirmedAction()" class="w-full py-2.5 px-4 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl text-xs transition-all shadow-md active:scale-95">
+                    Confirm Action
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2.5 max-w-sm w-full pointer-events-none"></div>
+
+    <!-- JAVASCRIPT APP LOGIC -->
+    <script>
+        // --- ADMIN PROFILE STATE ---
+        let adminProfile = {
+            name: "Administrator",
+            password: "admin123"
+        };
+
+        // --- INITIAL MOCK DATA STATE ---
+        let pendingApprovals = [
+            { id: 101, name: "Amaquin Christian John", gradeLevel: "Senior High Teacher", subject: "Personal development", email: "lalovesheand@gmail.com", teacherId: "102262", gradeTaught: "Senior High", strand: "HUMSS" },
+            { id: 102, name: "Ramos John Ariel", gradeLevel: "Junior High Teacher", subject: "PE", email: "j.ramos@tseki.edu.ph", teacherId: "102263", gradeTaught: "Junior High", strand: "MAPEH" },
+            { id: 103, name: "Ocanada Joshua", gradeLevel: "Elementary Teacher", subject: "English", email: "j.ocanada@tseki.edu.ph", teacherId: "102264", gradeTaught: "Elementary", strand: "General Education" },
+            { id: 104, name: "Dela Cruz Maria", gradeLevel: "Senior High Teacher", subject: "General Mathematics", email: "m.delacruz@tseki.edu.ph", teacherId: "102265", gradeTaught: "Senior High", strand: "STEM" },
+            { id: 105, name: "Santos Mark Anthony", gradeLevel: "Junior High Teacher", subject: "Science", email: "m.santos@tseki.edu.ph", teacherId: "102266", gradeTaught: "Junior High", strand: "Science & Tech" },
+            { id: 106, name: "Reyes Clarissa", gradeLevel: "Elementary Teacher", subject: "Filipino", email: "c.reyes@tseki.edu.ph", teacherId: "102267", gradeTaught: "Elementary", strand: "Languages" }
+        ];
+
+        let accounts = [
+            { id: 1, name: "Amaquin Christian John", gradeLevel: "Senior High Teacher", status: "Active" },
+            { id: 2, name: "Ramos John Ariel", gradeLevel: "Junior High Teacher", status: "Active" },
+            { id: 3, name: "Ocanada Joshua", gradeLevel: "Elementary Teacher", status: "Inactive" },
+            { id: 4, name: "Bautista Patricia", gradeLevel: "Senior High Teacher", status: "Active" },
+            { id: 5, name: "Villanueva Gabriel", gradeLevel: "Junior High Teacher", status: "Active" },
+            { id: 6, name: "Mendoza Sarah", gradeLevel: "Elementary Teacher", status: "Inactive" },
+            { id: 7, name: "Navarro Paolo", gradeLevel: "Senior High Teacher", status: "Active" }
+        ];
+
+        let activityLogs = [
+            { id: 6, name: "Navarro Paolo", action: "Submitted Midterm Assessment", timestamp: "Just now - 10/18/2026" },
+            { id: 5, name: "Bautista Patricia", action: "Updated Class Roster", timestamp: "2 minutes ago - 10/18/2026" },
+            { id: 4, name: "Ramos John Ariel", action: "Scanned Grade Sheet", timestamp: "3 minutes ago - 10/18/2026" },
+            { id: 3, name: "Amaquin Christian John", action: "Generate Perdev Assessment", timestamp: "5 minutes ago - 10/18/2026" },
+            { id: 2, name: "Amaquin Christian John", action: "Generate PE Assessment", timestamp: "10 minutes ago - 10/18/2026" },
+            { id: 1, name: "Amaquin Christian John", action: "Scanned Assessment", timestamp: "Last month - 9-12-2026" }
+        ];
+
+        let currentActiveModalId = null;
+        let pendingConfirmationAction = null;
+        let logCounter = 7;
+
+        // --- THEME SWITCHING (LIGHT & DARK MODE) ---
+
+        function setTheme(mode) {
+            const html = document.documentElement;
+            const icon = document.getElementById('themeToggleIcon');
+
+            if (mode === 'dark') {
+                html.classList.add('dark');
+                html.classList.remove('light');
+                icon.className = "fa-solid fa-sun text-amber-400 text-lg";
+            } else {
+                html.classList.remove('dark');
+                html.classList.add('light');
+                icon.className = "fa-solid fa-moon text-lg";
+            }
+        }
+
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.contains('dark');
+            setTheme(isDark ? 'light' : 'dark');
+            showToast(`Switched to ${isDark ? 'Light' : 'Dark'} Mode`, 'info');
+        }
+
+        // --- INTERACTIVE NAVIGATION & SCROLLING ---
+
+        function scrollToSection(sectionId, filterStatus = null) {
+            const section = document.getElementById(sectionId);
+            if (!section) return;
+
+            if (filterStatus) {
+                const statusFilterSelect = document.getElementById('accountStatusFilter');
+                if (statusFilterSelect) {
+                    statusFilterSelect.value = filterStatus;
+                    renderAccountsTable();
+                }
+            }
+
+            section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+            const flashClass = sectionId === 'pendingApprovalsSection' ? 'flash-amber' : 'flash-brand';
+            section.classList.remove('flash-amber', 'flash-brand');
+            
+            void section.offsetWidth; 
+            section.classList.add(flashClass);
+
+            setTimeout(() => {
+                section.classList.remove(flashClass);
+            }, 1300);
+        }
+
+        // --- RENDER FUNCTIONS ---
+
+        function renderStats() {
+            document.getElementById('statTotalAccounts').textContent = accounts.length;
+            document.getElementById('statPendingCount').textContent = pendingApprovals.length;
+            
+            const activeCount = accounts.filter(a => a.status === 'Active').length;
+            document.getElementById('statActiveCount').textContent = activeCount;
+
+            const pendingBadge = document.getElementById('pendingBadgeCount');
+            pendingBadge.textContent = `${pendingApprovals.length} Request${pendingApprovals.length === 1 ? '' : 's'} Pending`;
+        }
+
+        function renderPendingTable() {
+            const tbody = document.getElementById('pendingTableBody');
+            const emptyState = document.getElementById('pendingEmptyState');
+
+            tbody.innerHTML = '';
+
+            if (pendingApprovals.length === 0) {
+                emptyState.classList.remove('hidden');
+                return;
+            }
+            emptyState.classList.add('hidden');
+
+            pendingApprovals.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors";
+                tr.innerHTML = `
+                    <td class="py-4 px-6 font-bold text-slate-800 dark:text-slate-100">${escapeHtml(item.name)}</td>
+                    <td class="py-4 px-6 text-slate-600 dark:text-slate-300 font-medium">${escapeHtml(item.gradeLevel)}</td>
+                    <td class="py-4 px-6 text-slate-600 dark:text-slate-300">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                            ${escapeHtml(item.subject)}
+                        </span>
+                    </td>
+                    <td class="py-4 px-6 text-right">
+                        <button onclick="openApprovalModal(${item.id})" class="px-4 py-1.5 bg-slate-700 dark:bg-slate-800 hover:bg-brand-600 dark:hover:bg-brand-500 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-sm transition-all hover:shadow-md active:scale-95">
+                            VIEW
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderAccountsTable() {
+            const tbody = document.getElementById('accountTableBody');
+            const emptyState = document.getElementById('accountsEmptyState');
+            const searchVal = document.getElementById('accountSearchInput').value.toLowerCase().trim();
+            const statusFilter = document.getElementById('accountStatusFilter').value;
+
+            tbody.innerHTML = '';
+
+            const filtered = accounts.filter(acc => {
+                const matchesSearch = acc.name.toLowerCase().includes(searchVal) || acc.gradeLevel.toLowerCase().includes(searchVal);
+                const matchesStatus = statusFilter === 'ALL' || acc.status === statusFilter;
+                return matchesSearch && matchesStatus;
+            });
+
+            if (filtered.length === 0) {
+                emptyState.classList.remove('hidden');
+                return;
+            }
+            emptyState.classList.add('hidden');
+
+            filtered.forEach(acc => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors";
+
+                const isActive = acc.status === 'Active';
+                const statusBadge = isActive 
+                    ? `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/50">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Active
+                       </span>`
+                    : `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
+                        <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span> Inactive
+                       </span>`;
+
+                const toggleBtnText = isActive ? 'Disable' : 'Enable';
+                const toggleBtnClass = isActive 
+                    ? 'bg-slate-600 dark:bg-slate-700 hover:bg-slate-700 dark:hover:bg-slate-600 text-white' 
+                    : 'bg-emerald-600 hover:bg-emerald-700 text-white';
+
+                tr.innerHTML = `
+                    <td class="py-4 px-6 font-bold text-slate-800 dark:text-slate-100">${escapeHtml(acc.name)}</td>
+                    <td class="py-4 px-6 text-slate-600 dark:text-slate-300 font-medium">${escapeHtml(acc.gradeLevel)}</td>
+                    <td class="py-4 px-6">${statusBadge}</td>
+                    <td class="py-4 px-6 text-right space-x-2">
+                        <button onclick="requestToggleAccountStatus(${acc.id})" class="px-3 py-1.5 ${toggleBtnClass} text-xs font-bold rounded-lg transition-all shadow-sm active:scale-95">
+                            ${toggleBtnText}
+                        </button>
+                        <button onclick="requestDeleteAccount(${acc.id})" class="px-3 py-1.5 bg-rose-100 dark:bg-rose-950/50 hover:bg-rose-200 dark:hover:bg-rose-900/50 text-rose-700 dark:text-rose-300 text-xs font-bold rounded-lg transition-all active:scale-95">
+                            Delete
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderActivityLogs() {
+            const tbody = document.getElementById('activityLogTableBody');
+            const emptyState = document.getElementById('activityLogEmptyState');
+            const badge = document.getElementById('activityLogBadge');
+
+            tbody.innerHTML = '';
+            badge.textContent = `${activityLogs.length} Event${activityLogs.length === 1 ? '' : 's'}`;
+
+            if (activityLogs.length === 0) {
+                emptyState.classList.remove('hidden');
+                return;
+            }
+            emptyState.classList.add('hidden');
+
+            activityLogs.forEach(log => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors";
+                tr.innerHTML = `
+                    <td class="py-3 px-6 text-slate-400 dark:text-slate-500 font-mono text-xs font-bold">${log.id}</td>
+                    <td class="py-3 px-6 font-bold text-slate-800 dark:text-slate-100">${escapeHtml(log.name)}</td>
+                    <td class="py-3 px-6 text-slate-600 dark:text-slate-300">${escapeHtml(log.action)}</td>
+                    <td class="py-3 px-6 text-right text-slate-400 dark:text-slate-500 text-xs font-medium">${escapeHtml(log.timestamp)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // --- UPDATE PASSWORD MODAL CONTROLS ---
+
+        function openSettingsModal() {
+            document.getElementById('currentPasswordInput').value = '';
+            document.getElementById('newPasswordInput').value = '';
+            document.getElementById('confirmPasswordInput').value = '';
+            openModal('settingsModal', 'settingsModalCard');
+        }
+
+        function changeAdminPassword(e) {
+            e.preventDefault();
+            const currentPass = document.getElementById('currentPasswordInput').value;
+            const newPass = document.getElementById('newPasswordInput').value;
+            const confirmPass = document.getElementById('confirmPasswordInput').value;
+
+            if (currentPass !== adminProfile.password) {
+                showToast("Current password is incorrect!", "error");
+                return;
+            }
+
+            if (newPass.length < 6) {
+                showToast("New password must be at least 6 characters long.", "warning");
+                return;
+            }
+
+            if (newPass !== confirmPass) {
+                showToast("New passwords do not match!", "error");
+                return;
+            }
+
+            adminProfile.password = newPass;
+            document.getElementById('currentPasswordInput').value = '';
+            document.getElementById('newPasswordInput').value = '';
+            document.getElementById('confirmPasswordInput').value = '';
+
+            addActivityLog(adminProfile.name, "Changed Admin Password");
+            showToast("Password updated successfully!", "success");
+            closeModal('settingsModal', 'settingsModalCard');
+        }
+
+        // --- MODAL UTILITIES ---
+
+        function openModal(modalId, cardId) {
+            const modal = document.getElementById(modalId);
+            const card = document.getElementById(cardId);
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                card.classList.remove('scale-95');
+                card.classList.add('scale-100');
+            }, 10);
+        }
+
+        function closeModal(modalId, cardId) {
+            const modal = document.getElementById(modalId);
+            const card = document.getElementById(cardId);
+            card.classList.remove('scale-100');
+            card.classList.add('scale-95');
+            modal.classList.add('opacity-0');
+
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 200);
+        }
+
+        // --- APPROVAL MODAL ACTIONS ---
+
+        function openApprovalModal(id) {
+            const request = pendingApprovals.find(p => p.id === id);
+            if (!request) return;
+
+            currentActiveModalId = id;
+
+            document.getElementById('modalName').textContent = request.name;
+            document.getElementById('modalEmail').textContent = request.email;
+            document.getElementById('modalTeacherId').textContent = request.teacherId;
+            document.getElementById('modalGrade').textContent = request.gradeTaught;
+            document.getElementById('modalStrand').textContent = request.strand;
+            document.getElementById('modalPhotoName').textContent = request.name;
+
+            const initials = request.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+            document.getElementById('modalInitials').textContent = initials;
+
+            openModal('approvalModal', 'approvalModalCard');
+        }
+
+        function handleApprove() {
+            if (!currentActiveModalId) return;
+            const itemIndex = pendingApprovals.findIndex(p => p.id === currentActiveModalId);
+            if (itemIndex === -1) return;
+
+            const approvedUser = pendingApprovals[itemIndex];
+
+            const newAccId = accounts.length > 0 ? Math.max(...accounts.map(a => a.id)) + 1 : 1;
+            accounts.unshift({
+                id: newAccId,
+                name: approvedUser.name,
+                gradeLevel: approvedUser.gradeLevel,
+                status: "Active"
+            });
+
+            addActivityLog(approvedUser.name, "Approved Teacher Registration Request");
+            pendingApprovals.splice(itemIndex, 1);
+
+            showToast(`Approved registration for ${approvedUser.name}`, 'success');
+            
+            closeModal('approvalModal', 'approvalModalCard');
+            updateAllViews();
+        }
+
+        function handleReject() {
+            if (!currentActiveModalId) return;
+            const itemIndex = pendingApprovals.findIndex(p => p.id === currentActiveModalId);
+            if (itemIndex === -1) return;
+
+            const rejectedUser = pendingApprovals[itemIndex];
+
+            addActivityLog(rejectedUser.name, "Rejected Registration Request");
+            pendingApprovals.splice(itemIndex, 1);
+
+            showToast(`Rejected registration for ${rejectedUser.name}`, 'error');
+
+            closeModal('approvalModal', 'approvalModalCard');
+            updateAllViews();
+        }
+
+        // --- CONFIRMATION MODAL LOGIC ---
+
+        function triggerConfirmationModal({ icon, iconBg, iconColor, title, message, buttonText, buttonClass, action }) {
+            document.getElementById('confirmIcon').className = `fa-solid ${icon}`;
+            document.getElementById('confirmIconContainer').className = `w-16 h-16 rounded-2xl ${iconBg} ${iconColor} mx-auto flex items-center justify-center text-2xl shadow-inner`;
+            document.getElementById('confirmTitle').textContent = title;
+            document.getElementById('confirmMessage').textContent = message;
+
+            const actionBtn = document.getElementById('confirmActionButton');
+            actionBtn.textContent = buttonText;
+            actionBtn.className = `w-full py-2.5 px-4 font-bold rounded-xl text-xs transition-all shadow-md active:scale-95 ${buttonClass}`;
+
+            pendingConfirmationAction = action;
+            openModal('confirmationModal', 'confirmationModalCard');
+        }
+
+        function executeConfirmedAction() {
+            if (typeof pendingConfirmationAction === 'function') {
+                pendingConfirmationAction();
+            }
+            closeModal('confirmationModal', 'confirmationModalCard');
+            pendingConfirmationAction = null;
+        }
+
+        // 1. CONFIRM DISABLE / ENABLE ACCOUNT
+        function requestToggleAccountStatus(id) {
+            const acc = accounts.find(a => a.id === id);
+            if (!acc) return;
+
+            const isDisabling = acc.status === 'Active';
+
+            triggerConfirmationModal({
+                icon: isDisabling ? 'fa-user-slash' : 'fa-user-check',
+                iconBg: isDisabling ? 'bg-amber-100 dark:bg-amber-950/80' : 'bg-emerald-100 dark:bg-emerald-950/80',
+                iconColor: isDisabling ? 'text-amber-700 dark:text-amber-300' : 'text-emerald-700 dark:text-emerald-300',
+                title: isDisabling ? `Disable ${acc.name}?` : `Enable ${acc.name}?`,
+                message: isDisabling 
+                    ? `Are you sure you want to disable ${acc.name}? Disabling will temporarily revoke their portal access while retaining their assessment history.`
+                    : `Are you sure you want to enable ${acc.name}? This will immediately restore their portal access and permissions.`,
+                buttonText: isDisabling ? 'Confirm Disable' : 'Confirm Enable',
+                buttonClass: isDisabling ? 'bg-amber-600 hover:bg-amber-700 text-white' : 'bg-emerald-600 hover:bg-emerald-700 text-white',
+                action: () => {
+                    acc.status = acc.status === 'Active' ? 'Inactive' : 'Active';
+                    addActivityLog(acc.name, `Account status changed to ${acc.status}`);
+                    showToast(`Account for ${acc.name} is now ${acc.status}`, 'info');
+                    updateAllViews();
+                }
+            });
+        }
+
+        // 2. CONFIRM DELETE ACCOUNT
+        function requestDeleteAccount(id) {
+            const acc = accounts.find(a => a.id === id);
+            if (!acc) return;
+
+            triggerConfirmationModal({
+                icon: 'fa-trash-can',
+                iconBg: 'bg-rose-100 dark:bg-rose-950/80',
+                iconColor: 'text-rose-700 dark:text-rose-300',
+                title: `Permanently Delete ${acc.name}?`,
+                message: `Are you sure you want to permanently delete ${acc.name}? This action cannot be undone and will permanently remove their credentials and data from the system.`,
+                buttonText: 'Confirm Delete',
+                buttonClass: 'bg-rose-600 hover:bg-rose-700 text-white',
+                action: () => {
+                    const index = accounts.findIndex(a => a.id === id);
+                    if (index !== -1) {
+                        const deletedName = accounts[index].name;
+                        accounts.splice(index, 1);
+                        addActivityLog(deletedName, "Account Permanently Deleted from System");
+                        showToast(`Account permanently deleted for ${deletedName}`, 'warning');
+                        updateAllViews();
+                    }
+                }
+            });
+        }
+
+        // 3. CONFIRM CLEAR ACTIVITY LOGS
+        function requestClearLogs() {
+            if (activityLogs.length === 0) {
+                showToast("Activity logs are already empty.", "info");
+                return;
+            }
+
+            triggerConfirmationModal({
+                icon: 'fa-folder-minus',
+                iconBg: 'bg-slate-200 dark:bg-slate-800',
+                iconColor: 'text-slate-700 dark:text-slate-300',
+                title: 'Clear All Activity Logs?',
+                message: 'Are you sure you want to clear all activity logs? This will wipe the current session audit history and cannot be retrieved.',
+                buttonText: 'Clear All Logs',
+                buttonClass: 'bg-slate-800 dark:bg-slate-700 hover:bg-slate-900 text-white',
+                action: () => {
+                    activityLogs = [];
+                    renderActivityLogs();
+                    showToast("Session activity logs cleared", "info");
+                }
+            });
+        }
+
+        function addActivityLog(name, action) {
+            const now = new Date();
+            const timeFormatted = `Just now - ${now.getMonth() + 1}/${now.getDate()}/${now.getFullYear()}`;
+            
+            activityLogs.unshift({
+                id: logCounter++,
+                name: name,
+                action: action,
+                timestamp: timeFormatted
+            });
+
+            renderActivityLogs();
+        }
+
+        function updateAllViews() {
+            renderStats();
+            renderPendingTable();
+            renderAccountsTable();
+            renderActivityLogs();
+        }
+
+        // --- TOAST NOTIFICATIONS ---
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+
+            const toast = document.createElement('div');
+            toast.className = "pointer-events-auto p-4 rounded-xl shadow-xl flex items-center justify-between space-x-3 text-sm font-bold border transform transition-all duration-300 translate-y-5 opacity-0";
+
+            let iconClass = "fa-circle-info text-blue-500";
+            let bgClass = "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100";
+
+            if (type === 'success') {
+                iconClass = "fa-circle-check text-emerald-500";
+                bgClass = "bg-emerald-950 text-emerald-100 border-emerald-800";
+            } else if (type === 'error') {
+                iconClass = "fa-circle-xmark text-rose-500";
+                bgClass = "bg-rose-950 text-rose-100 border-rose-800";
+            } else if (type === 'warning') {
+                iconClass = "fa-triangle-exclamation text-amber-500";
+                bgClass = "bg-amber-950 text-amber-100 border-amber-800";
+            } else if (type === 'info') {
+                iconClass = "fa-circle-info text-brand-500";
+                bgClass = "bg-slate-900 text-slate-100 border-slate-800";
+            }
+
+            toast.className += ` ${bgClass}`;
+
+            toast.innerHTML = `
+                <div class="flex items-center space-x-2.5">
+                    <i class="fa-solid ${iconClass} text-base"></i>
+                    <span>${escapeHtml(message)}</span>
+                </div>
+                <button onclick="this.parentElement.remove()" class="opacity-70 hover:opacity-100 transition-opacity">
+                    <i class="fa-solid fa-xmark text-xs"></i>
+                </button>
+            `;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-5', 'opacity-0');
+            }, 10);
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        // --- UTILITIES & INIT ---
+
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        function updateClock() {
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            document.getElementById('liveClock').innerHTML = `<i class="fa-regular fa-calendar-check mr-1.5 text-brand-600 dark:text-brand-500"></i> ${dateStr} • ${timeStr}`;
+        }
+
+        window.onload = function () {
+            updateAllViews();
+            updateClock();
+            setInterval(updateClock, 1000);
+
+            document.getElementById('accountSearchInput').addEventListener('input', renderAccountsTable);
+            document.getElementById('accountStatusFilter').addEventListener('change', renderAccountsTable);
+
+            // Modal Backdrop Clicks
+            document.getElementById('approvalModal').addEventListener('click', function(e) {
+                if (e.target === this) closeModal('approvalModal', 'approvalModalCard');
+            });
+            document.getElementById('confirmationModal').addEventListener('click', function(e) {
+                if (e.target === this) closeModal('confirmationModal', 'confirmationModalCard');
+            });
+            document.getElementById('settingsModal').addEventListener('click', function(e) {
+                if (e.target === this) closeModal('settingsModal', 'settingsModalCard');
+            });
+        }
+    </script>
+</body>
+</html>
